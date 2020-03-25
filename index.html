@@ -17,18 +17,6 @@
       const message_ref = {}
       const sha_ref = {}
 
-      const getSha = (node, target, stack = [node]) => {
-        while (stack.length) {
-          const current = stack.pop()
-          if (current.path === target) {
-            return current.sha
-          }
-          if (current.children) {
-            stack.push(...current.children)
-          }
-        }
-      }
-
       const submit = async (type = "cou") => {
         let res
         if (type === "cou") {
@@ -90,9 +78,9 @@
                   <td><input ref=${sha_ref} type="text" />
                     <button onclick=${() =>
                       request(() =>
-                        github.getContentTree("test-api").then(tree => {
-                          sha_ref.current.value = getSha(
-                            tree,
+                        github.getContentTree("test-api").then(async tree => {
+                          sha_ref.current.value = await github.getSha(
+                            "test-api",
                             path_ref.current.value
                           )
                         })

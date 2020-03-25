@@ -29,20 +29,31 @@
         }
       }
 
-      const submit = () =>
-        github
-          .createFile("test-api", path_ref.current.value, {
+      const submit = async (type = "cou") => {
+        let res
+        if (type === "cou") {
+          res = await github.createFile("test-api", path_ref.current.value, {
             message: message_ref.current.value,
             content: btoa(content_ref.current.value),
             sha: sha_ref.current.value
           })
-          .then(res => {
-            if (res.content && res.commit) {
-              alert("提交成功")
-            } else {
-              alert("提交失败")
-            }
+        } else if (type === "del") {
+          res = await github.removeFile("test-api", path_ref.current.value, {
+            message: message_ref.current.value,
+            sha: sha_ref.current.value
           })
+        } else {
+          return
+        }
+
+        console.log(res)
+
+        if (res.commit) {
+          alert("提交成功")
+        } else {
+          alert("提交失败")
+        }
+      }
 
       const login = err => {
         const username = prompt("输入用户名")
@@ -93,6 +104,11 @@
                   <button onclick=${() => {
                     request(submit)
                   }}>submit</button>
+                  </td>
+                  <td>
+                  <button onclick=${() => {
+                    request(() => submit("del"))
+                  }}>delete</button>
                   </td>
                 </tr>
               </tbody>

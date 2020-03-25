@@ -29,6 +29,36 @@
         }
       }
 
+      const submit = () =>
+        github
+          .createFile("test-api", path_ref.current.value, {
+            message: message_ref.current.value,
+            content: btoa(content_ref.current.value),
+            sha: sha_ref.current.value
+          })
+          .then(res => {
+            if (res.content && res.commit) {
+              alert("提交成功")
+            } else {
+              alert("提交失败")
+            }
+          })
+
+      const login = err => {
+        const username = prompt("输入用户名")
+        const password = prompt("输入密码")
+        github.login(username, password)
+      }
+
+      const request = callback => {
+        if (localStorage.getItem("Authorization")) {
+          callback()
+        } else {
+          login()
+          callback()
+        }
+      }
+
       jsx.render(
         jsx`<table>
               <tbody>
@@ -48,24 +78,20 @@
                   <th>sha:</th>
                   <td><input ref=${sha_ref} type="text" />
                     <button onclick=${() =>
-                      github.getContentTree("test-api").then(tree => {
-                        sha_ref.current.value = getSha(
-                          tree,
-                          path_ref.current.value
-                        )
-                      })}>get sha</button>
+                      request(() =>
+                        github.getContentTree("test-api").then(tree => {
+                          sha_ref.current.value = getSha(
+                            tree,
+                            path_ref.current.value
+                          )
+                        })
+                      )}>get sha</button>
                     </td>
                 </tr>
                 <tr>
                   <td>
                   <button onclick=${() => {
-                    github
-                      .createFile("test-api", path_ref.current.value, {
-                        message: message_ref.current.value,
-                        content: btoa(content_ref.current.value),
-                        sha: sha_ref.current.value
-                      })
-                      .then(console.log)
+                    request(submit)
                   }}>submit</button>
                   </td>
                 </tr>

@@ -4,8 +4,75 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="https://saber2pr.top/github-edit/github.min.js"></script>
-    <title>Document</title>
+    <script src="./github.min.js"></script>
+    <script src="./jsx.min.js"></script>
+    <title>test api</title>
   </head>
-  <body></body>
+  <body>
+    <div id="root"></div>
+    <script>
+      const root = document.querySelector("#root")
+      const path_ref = {}
+      const content_ref = {}
+      const message_ref = {}
+      const sha_ref = {}
+
+      const getSha = (node, target, stack = [node]) => {
+        while (stack.length) {
+          const current = stack.pop()
+          if (current.path === target) {
+            return current.sha
+          }
+          if (current.children) {
+            stack.push(...current.children)
+          }
+        }
+      }
+
+      jsx.render(
+        jsx`<table>
+              <tbody>
+                <tr>
+                  <th>path:</th>
+                  <td><input ref=${path_ref} type="text" /></td>
+                </tr>
+                <tr>
+                  <th>content:</th>
+                  <td><textarea ref=${content_ref}></textarea></td>
+                </tr>
+                <tr>
+                  <th>message:</th>
+                  <td><input ref=${message_ref} type="text" /></td>
+                </tr>
+                <tr>
+                  <th>sha:</th>
+                  <td><input ref=${sha_ref} type="text" />
+                    <button onclick=${() =>
+                      github.getContentTree("test-api").then(tree => {
+                        sha_ref.current.value = getSha(
+                          tree,
+                          path_ref.current.value
+                        )
+                      })}>get sha</button>
+                    </td>
+                </tr>
+                <tr>
+                  <td>
+                  <button onclick=${() => {
+                    github
+                      .createFile("test-api", path_ref.current.value, {
+                        message: message_ref.current.value,
+                        content: btoa(content_ref.current.value),
+                        sha: sha_ref.current.value
+                      })
+                      .then(console.log)
+                  }}>submit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>`,
+        root
+      )
+    </script>
+  </body>
 </html>

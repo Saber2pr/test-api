@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="./lib/github.min.js"></script>
     <script src="./lib/jsx.min.js"></script>
+    <script src="./lib/base64.min.js"></script>
     <title>test api</title>
   </head>
   <body>
@@ -22,7 +23,7 @@
         if (type === "cou") {
           res = await github.createFile("test-api", path_ref.current.value, {
             message: message_ref.current.value,
-            content: btoa(content_ref.current.value),
+            content: Base64.encode(content_ref.current.value),
             sha: sha_ref.current.value
           })
         } else if (type === "del") {
